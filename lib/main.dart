@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_api_frontend/screens/categories.dart';
 import 'package:flutter_api_frontend/screens/login.dart';
 import 'package:flutter_api_frontend/screens/register.dart';
 
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => Login(),
         '/register': (context) => Register(),
+        '/categories': (context) => Categories(),
       }
     );
   }
