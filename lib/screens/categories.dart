@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -6,10 +8,7 @@ class Category {
   int id;
   String name;
 
-  Category({
-    required this.id,
-    required this.name
-  });
+  Category({required this.id, required this.name});
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(id: json['id'], name: json['name']);
@@ -23,15 +22,38 @@ class Categories extends StatefulWidget {
 
 class _CategoriesState extends State<Categories> {
   late Future<List<Category>> futureCategories;
+  late Category selectedCategory;
+  final _formKey = GlobalKey<FormState>();
+  final categoryNameController = TextEditingController();
+
 
   Future<List<Category>> fetchCategories() async {
-    http.Response response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/api/categories')
-    );
+    http.Response response =
+        await http.get(Uri.parse('http://10.0.2.2:8000/api/categories'));
 
     List categories = jsonDecode(response.body);
 
     return categories.map((category) => Category.fromJson(category)).toList();
+  }
+
+  Future saveCategory() async {
+    final form = _formKey.currentState;
+
+    if (!form!.validate()) {
+      return;
+    }
+
+    String uri = 'http://10.0.2.2:8000/api/categories/' + selectedCategory.id.toString();
+
+    await http.patch(Uri.parse(uri),
+      headers: {
+          HttpHeaders.contentTypeHeader : 'application/json',
+          HttpHeaders.acceptHeader : 'application/json',
+      },
+      body: jsonEncode({'name' : categoryNameController.text })
+    );
+
+    Navigator.pop(context);
   }
 
   @override
@@ -56,6 +78,41 @@ class _CategoriesState extends State<Categories> {
                       Category category = snapshot.data![index];
                       return ListTile(
                         title: Text(category.name),
+                        trailing: IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            selectedCategory = category;
+                            categoryNameController.text = category.name;
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Padding(
+                                      padding: EdgeInsets.all(10.0),
+                                      child: Form(
+                                          key: _formKey,
+                                          child: Column(children: <Widget>[
+                                            TextFormField(
+                                              controller: categoryNameController,
+                                              validator: (String? value) {
+                                                if (value!.isEmpty) {
+                                                  return 'Enter category name';
+                                                }
+                                                return null;
+                                              },
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(),
+                                                labelText: 'Category name',
+                                              ),
+                                            ),
+                                            ElevatedButton(
+                                              child: Text('Save'),
+                                              onPressed: () =>
+                                                  saveCategory(),
+                                            )
+                                          ])));
+                                });
+                          },
+                        ),
                       );
                     });
               } else if (snapshot.hasError) {
