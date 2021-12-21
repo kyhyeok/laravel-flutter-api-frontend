@@ -25,19 +25,50 @@ class _CategoriesState extends State<Categories> {
               Category category = categories[index];
               return ListTile(
                 title: Text(category.name),
-                trailing: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) {
-                          return CategoryEdit(category, provider.updateCategory);
-                        });
-                  },
-                ),
+                trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (context) {
+                            return CategoryEdit(category, provider.updateCategory);
+                          });
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Confirmation'),
+                          content: Text('Aur you sure you want to delete?'),
+                          actions: [
+                            TextButton(
+                              child: Text('Cancel'),
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                            TextButton(
+                                child: Text('Delete'),
+                                onPressed: () => deleteCategory(provider.deleteCategory, category),
+                            ),
+                          ]
+                        );
+                      }
+                    ),
+                  )
+                ]),
               );
             })
     );
+  }
+
+  Future deleteCategory(Function callback, Category category) async {
+    await callback(category);
+    Navigator.pop(context);
   }
 }
