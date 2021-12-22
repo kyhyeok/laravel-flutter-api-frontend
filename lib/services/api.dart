@@ -1,17 +1,27 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-
 import 'package:flutter_api_frontend/models/Category.dart';
 import 'package:http/http.dart' as http;
+
 class ApiService {
-  ApiService();
+  late String token;
+
+  ApiService(String token) {
+    this.token = token;
+  }
 
   final String baseUrl = 'http://10.0.2.2:8000/api/';
 
   Future<List<Category>> fetchCategories() async {
     http.Response response = await http
-        .get(Uri.parse(baseUrl + 'categories'));
+        .get(Uri.parse(baseUrl + 'categories'),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+      },
+    );
 
     List categories =jsonDecode(response.body);
 
@@ -25,6 +35,7 @@ class ApiService {
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
         },
         body: jsonEncode({ 'name': name })
     );
@@ -43,6 +54,7 @@ class ApiService {
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
         HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $token',
       },
       body: jsonEncode(({'name' : category.name}))
     );
@@ -56,7 +68,13 @@ class ApiService {
 
   Future<void> deleteCategory(id) async {
     String uri = baseUrl + 'categories/' + id.toString();
-    http.Response response = await http.delete(Uri.parse(uri));
+    http.Response response = await http.delete(Uri.parse(uri),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+      },
+    );
 
     if (response.statusCode != 204) {
       throw Exception('Error happened on delete');
