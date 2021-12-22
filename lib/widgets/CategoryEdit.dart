@@ -6,7 +6,8 @@ class CategoryEdit extends StatefulWidget {
   final Category category;
   final Function categoryCallback;
 
-  CategoryEdit(this.category, this.categoryCallback,  {Key? key}) : super(key: key);
+  CategoryEdit(this.category, this.categoryCallback, {Key? key})
+      : super(key: key);
 
   @override
   _CategoryEditState createState() => _CategoryEditState();
@@ -27,45 +28,43 @@ class _CategoryEditState extends State<CategoryEdit> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10.0),
-      child: Form(
-        key: _formKey,
-        child: Column(children: <Widget>[
-          TextFormField(
-            onChanged: (text) => setState(() => errorMessage = ''),
-            controller: categoryNameController,
-            validator: (String? value) {
-              if (value!.isEmpty) {
-                return 'Enter category name';
-              }
+        padding: EdgeInsets.all(10.0),
+        child: Form(
+            key: _formKey,
+            child: Column(children: <Widget>[
+              TextFormField(
+                onChanged: (text) => setState(() => errorMessage = ''),
+                controller: categoryNameController,
+                validator: (String? value) {
+                  if (value!.isEmpty) {
+                    return 'Enter category name';
+                  }
 
-              return null;
-            },
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Category name',
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              ElevatedButton(
-                child: Text('Save'),
-                onPressed: () => saveCategory(),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red
+                  return null;
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Category name',
                 ),
-                child: Text('Cancel'),
-                onPressed: () => Navigator.pop(context),
               ),
-            ]
-          ),
-          Text(errorMessage, style: TextStyle(color: Colors.red),)
-        ])
-      )
-    );
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    ElevatedButton(
+                      child: Text('Save'),
+                      onPressed: () => saveCategory(),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: Colors.red),
+                      child: Text('Cancel'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ]),
+              Text(
+                errorMessage,
+                style: TextStyle(color: Colors.red),
+              )
+            ])));
   }
 
   Future saveCategory() async {
@@ -79,6 +78,5 @@ class _CategoryEditState extends State<CategoryEdit> {
 
     await widget.categoryCallback(widget.category);
     Navigator.pop(context);
-
   }
 }

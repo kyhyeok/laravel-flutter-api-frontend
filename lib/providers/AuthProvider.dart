@@ -3,7 +3,6 @@ import 'package:flutter_api_frontend/services/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
-
   bool isAuthenticated = false;
   late String token;
   late ApiService apiService;
@@ -23,8 +22,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> register(String name, String email, String password,
       String passwordConfirm, String deviceName) async {
-
-    this.token = await apiService.register(name, email, password, passwordConfirm, deviceName);
+    this.token = await apiService.register(
+        name, email, password, passwordConfirm, deviceName);
     this.isAuthenticated = true;
     setToken(this.token);
     notifyListeners();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api_frontend/providers/AuthProvider.dart';
+import 'package:flutter_api_frontend/providers/TransactionProvider.dart';
 import 'package:flutter_api_frontend/screens/home.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_api_frontend/screens/categories.dart';
@@ -19,6 +20,8 @@ class MyApp extends StatelessWidget {
               providers: [
                 ChangeNotifierProvider<CategoryProvider>(
                     create: (context) => CategoryProvider(authProvider)),
+                ChangeNotifierProvider<TransactionProvider>(
+                    create: (context) => TransactionProvider(authProvider)),
               ],
               child: MaterialApp(title: 'Welcome to Flutter', routes: {
                 '/': (context) {

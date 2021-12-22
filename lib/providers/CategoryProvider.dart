@@ -16,7 +16,7 @@ class CategoryProvider extends ChangeNotifier {
   }
 
   Future init() async {
-    categories= await apiService.fetchCategories();
+    categories = await apiService.fetchCategories();
     notifyListeners();
   }
 

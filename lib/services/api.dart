@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 import 'package:flutter_api_frontend/models/Category.dart';
+import 'package:flutter_api_frontend/models/Transaction.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -14,16 +15,15 @@ class ApiService {
   final String baseUrl = 'http://10.0.2.2:8000/api/';
 
   Future<List<Category>> fetchCategories() async {
-    http.Response response = await http
-        .get(Uri.parse(baseUrl + 'categories'),
+    http.Response response = await http.get(
+      Uri.parse(baseUrl + 'categories'),
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
-        HttpHeaders.acceptHeader: 'application/json',
         HttpHeaders.authorizationHeader: 'Bearer $token',
       },
     );
 
-    List categories =jsonDecode(response.body);
+    List categories = jsonDecode(response.body);
 
     return categories.map((category) => Category.fromJson(category)).toList();
   }
@@ -37,8 +37,7 @@ class ApiService {
           HttpHeaders.acceptHeader: 'application/json',
           HttpHeaders.authorizationHeader: 'Bearer $token',
         },
-        body: jsonEncode({ 'name': name })
-    );
+        body: jsonEncode({'name': name}));
 
     if (response.statusCode != 201) {
       throw Exception('Error happened on save');
@@ -51,13 +50,12 @@ class ApiService {
     String uri = baseUrl + 'categories/' + category.id.toString();
 
     http.Response response = await http.patch(Uri.parse(uri),
-      headers: {
-        HttpHeaders.contentTypeHeader: 'application/json',
-        HttpHeaders.acceptHeader: 'application/json',
-        HttpHeaders.authorizationHeader: 'Bearer $token',
-      },
-      body: jsonEncode(({'name' : category.name}))
-    );
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+        body: jsonEncode(({'name': category.name})));
 
     if (response.statusCode != 200) {
       throw Exception('Error happened on update');
@@ -68,7 +66,8 @@ class ApiService {
 
   Future<void> deleteCategory(id) async {
     String uri = baseUrl + 'categories/' + id.toString();
-    http.Response response = await http.delete(Uri.parse(uri),
+    http.Response response = await http.delete(
+      Uri.parse(uri),
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
         HttpHeaders.acceptHeader: 'application/json',
@@ -81,7 +80,87 @@ class ApiService {
     }
   }
 
-  Future<String> register(String name, String email, String password, String passwordConfirm, String deviceName) async {
+  Future<List<Transaction>> fetchTransactions() async {
+    http.Response response = await http.get(
+      Uri.parse(baseUrl + 'transactions'),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+      },
+    );
+
+    List transactions = jsonDecode(response.body);
+
+    return transactions
+        .map((transaction) => Transaction.fromJson(transaction))
+        .toList();
+  }
+
+  Future<Transaction> addTransaction(
+      String amount, String category, String description, String date) async {
+    String uri = baseUrl + 'transactions';
+
+    http.Response response = await http.post(Uri.parse(uri),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+        body: jsonEncode({
+          'amount': amount,
+          'category': category,
+          'description': description,
+          'date': date,
+        }));
+
+    if (response.statusCode != 201) {
+      throw Exception('Error happened on save');
+    }
+
+    return Transaction.fromJson(jsonDecode(response.body));
+  }
+
+  Future<Transaction> updateTransaction(Transaction transaction) async {
+    String uri = baseUrl + 'transactions/' + transaction.id.toString();
+
+    http.Response response = await http.patch(Uri.parse(uri),
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json',
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+        body: jsonEncode({
+          'amount': transaction.amount,
+          'category_id': transaction.categoryId,
+          'description': transaction.description,
+          'transaction_date': transaction.transactionDate,
+        }));
+
+    if (response.statusCode != 200) {
+      throw Exception('Error happened on update');
+    }
+
+    return Transaction.fromJson(jsonDecode(response.body));
+  }
+
+  Future<void> deleteTransaction(id) async {
+    String uri = baseUrl + 'transactions/' + id.toString();
+    http.Response response = await http.delete(
+      Uri.parse(uri),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Error happened on delete');
+    }
+  }
+
+  Future<String> register(String name, String email, String password,
+      String passwordConfirm, String deviceName) async {
     String uri = baseUrl + 'auth/register';
 
     http.Response response = await http.post(Uri.parse(uri),
@@ -121,11 +200,8 @@ class ApiService {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',
         },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'device_name': deviceName
-        }));
+        body: jsonEncode(
+            {'email': email, 'password': password, 'device_name': deviceName}));
 
     if (response.statusCode == 422) {
       Map<String, dynamic> body = jsonDecode(response.body);
