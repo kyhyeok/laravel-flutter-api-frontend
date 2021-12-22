@@ -25,7 +25,7 @@ class AuthProvider extends ChangeNotifier {
     isAuthenticated = true;
   }
 
-  Future<void> logout() async {
+  Future<void> logOut() async {
     token = '';
     isAuthenticated = false;
     notifyListeners();

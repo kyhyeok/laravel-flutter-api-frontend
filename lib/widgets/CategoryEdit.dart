@@ -15,6 +15,7 @@ class CategoryEdit extends StatefulWidget {
 class _CategoryEditState extends State<CategoryEdit> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final categoryNameController = TextEditingController();
+
   String errorMessage = '';
 
   @override
